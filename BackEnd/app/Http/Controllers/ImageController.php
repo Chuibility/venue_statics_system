@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Models\Image_model;
+use App\Http\Models\Attribute_model;
 use Faker\Provider\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,14 @@ final class ImageController extends Controller
             $faceAttributes = $face['faceAttributes'];
             $gender = trim($faceAttributes['gender']);
             $age = floatval($faceAttributes['age']);
+
+            /* 存在则考虑笑容 */
+            if (array_key_exists('smile', $faceAttributes)) {
+                $smile = new Attribute_model();
+                $smile->type = 'smile';
+                $smile->property = floatval($faceAttributes['smile']);
+                $smile->save();
+            }
 
             // 后端检查
             if ($gender !== 'male' && $gender !== 'female') {
@@ -128,6 +137,17 @@ final class ImageController extends Controller
                 'gender' => $single->gender,
                 'age' => $single->age
             ];
+        }
+        return response()->json($list)->header('Access-Control-Allow-Origin', '*');
+    }
+
+    public function get_smile(Request $request)
+    {
+        $list = [];
+        // 现在只有 smile, 不搜索了
+        $smiles = DB::table('attribute')->get();
+        foreach ($smiles as $smile) {
+            $list[] = $smile->property;
         }
         return response()->json($list)->header('Access-Control-Allow-Origin', '*');
     }

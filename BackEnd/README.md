@@ -27,6 +27,8 @@ vim .env
 
 Input:
 
+**"Smile" is optional.**
+
 ```
 [
     {
@@ -39,6 +41,7 @@ Input:
         },
         "faceAttributes": {
             "gender": "male",
+            "smile": 0.88,
             "age": 24.4
         }
     },
@@ -66,29 +69,24 @@ Output:
 [
     {
         "faceId": "b9a33aewq00-0b28-4c89-a48a-93b2a931774e",
-        "faceRectangle": {
-            "top": 120,
-            "left": 814,
-            "width": 87,
-            "height": 87
-        },
-        "faceAttributes": {
-            "gender": "male",
-            "age": 24.4
-        }
+        "gender": "female",
+        "age": "24"
     },
-	{
+    {
         "faceId": "b9a33asd00-0b28-4c89-a48a-93b2a931774e",
-        "faceRectangle": {
-            "top": 120,
-            "left": 814,
-            "width": 87,
-            "height": 87
-        },
-        "faceAttributes": {
-            "gender": "male",
-            "age": 24.4
-        }
+        "gender": "male",
+        "age": "24"
     }
 ]
 ``` 
+
+### GET /image/smile
+
+Output:
+
+```
+[
+    0.88,
+    0.77
+]
+```
