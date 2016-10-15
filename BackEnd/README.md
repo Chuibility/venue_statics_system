@@ -1,16 +1,14 @@
-# UMJI-TAXI Back-End
+# Back-End
 
 The back-end is based on laravel.
 
 ## Environment
 
-- MySQL 5.6
 - php 5.6
-- laravel 5.2
+- Laravel 5.2
 
 ## Installation
 
-安装过程纯属yy，错了别怪我
 ```
 # Set up laravel
 composer install
@@ -23,67 +21,74 @@ cp .env.example .env
 vim .env
 ```
 
-## API Goal
+## API
 
-因为我懒得写wiki就丢在这里了,此处感谢 @jcpwfloi 大神
+### POST /image/add
 
-### /list/get/:id
-
-对应ListController@Detail方法
-```
-{
-  name: String,
-  creator: String,
-  from: String,
-  to: String,
-  peoples: [User],
-  expectedNum: Number,
-  state: Number
-}
-```
-peoples给username
-
-### /list/get
-
-* Will support pagination plugin in next version
-
-对应ListController@index方法
+Input:
 
 ```
-[{
-    creator: String,
-	from: String,
-	to: String,
-	currentNum: Number,
-	expectedNum: Number,
-	state: Number
-}]
+[
+    {
+        "faceId": "b9a33aewq00-0b28-4c89-a48a-93b2a931774e",
+        "faceRectangle": {
+            "top": 120,
+            "left": 814,
+            "width": 87,
+            "height": 87
+        },
+        "faceAttributes": {
+            "gender": "male",
+            "age": 24.4
+        }
+    },
+	{
+        "faceId": "b9a33asd00-0b28-4c89-a48a-93b2a931774e",
+        "faceRectangle": {
+            "top": 120,
+            "left": 814,
+            "width": 87,
+            "height": 87
+        },
+        "faceAttributes": {
+            "gender": "male",
+            "age": 24.4
+        }
+    }
+]
+``` 
+
+### GET /image/get
+
+Output:
+
 ```
-
-#### Explanations for State
-> * 0 for active
-> * 1 for completed
-
-### /list/remove/:id
-```
-{
-	status: 'success'
-}
-```
-or if errored:
-
-```
-{
-	status: 'error'
-}
-```
-### POST /list/update/:id
-* Asynchronously update the list via post params and return `status`
-
-
-### PUT /list/add
-* Asynchronously add an list element to the database and return `status`
-
-### POST /user/authToken
-* If the token does not exists, then create one and return `new` state.
-* If the token already exists, return user data.
+[
+    {
+        "faceId": "b9a33aewq00-0b28-4c89-a48a-93b2a931774e",
+        "faceRectangle": {
+            "top": 120,
+            "left": 814,
+            "width": 87,
+            "height": 87
+        },
+        "faceAttributes": {
+            "gender": "male",
+            "age": 24.4
+        }
+    },
+	{
+        "faceId": "b9a33asd00-0b28-4c89-a48a-93b2a931774e",
+        "faceRectangle": {
+            "top": 120,
+            "left": 814,
+            "width": 87,
+            "height": 87
+        },
+        "faceAttributes": {
+            "gender": "male",
+            "age": 24.4
+        }
+    }
+]
+``` 
