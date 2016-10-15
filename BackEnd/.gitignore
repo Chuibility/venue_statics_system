@@ -1,0 +1,16 @@
+# Default
+/vendor
+/node_modules
+/public/storage
+Homestead.yaml
+Homestead.json
+.env
+
+# log and database
+*.log
+*.sql
+
+# Individual Settings
+.idea/
+.DS_Store
+*.sublime-*
