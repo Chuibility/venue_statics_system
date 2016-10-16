@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use anlutro\cURL\Laravel\cURL;
 use App\Http\Controllers\Controller;
 use App\Http\Models\Image_model;
 use App\Http\Models\Attribute_model;
@@ -49,6 +50,9 @@ final class ImageController extends Controller
         $faces = json_decode($request->getContent(), true);
         //return $this->jsonGeneral->show_success($hello);
         foreach ($faces as $face) {
+            if (!array_key_exists('faceId', $face)) {
+                $this->jsonGeneral->show_error('error faceId');
+            }
             $faceId = $face['faceId'];
             $faceAttributes = $face['faceAttributes'];
             $gender = trim($faceAttributes['gender']);
@@ -71,15 +75,35 @@ final class ImageController extends Controller
             }
 
             // 检查 faceId 是否存在
-            $result = Image_model::where('faceId', $faceId)->get()->first();
-            if (!$result) {
+            //$result = Image_model::where('faceId', $faceId)->get()->first();
+            /*
+            $people = DB::table('image')->get();
+            foreach ($people as $single) {
+                $curl = new \anlutro\cURL\cURL();
+                $url = $curl->buildUrl('https://api.projectoxford.ai/face/v1.0/verify',
+                    ["faceId1" => $single->faceId,
+                    "faceId2" => $faceId]);
+                $veriresponse = $curl->post($url, ["Content-Type" => "application/json",
+                    "Ocp-Apim-Subscription-Key" => "2b83e4bd95f943ef8acfecb58ca11441"]);
+                $result = json_decode($veriresponse->body, true);
+                return $this->jsonGeneral->show_success($result);
+                if ($result['isIdentical'] !== 'false') {
+                    return $this->jsonGeneral->show_success('identical face');
+                }
+            }*/
+            /*$people = DB::table('image')->get();
+            if (count($people) > 3) {
+                return $this->jsonGeneral->show_success('success2');
+            }*/
+
+            //if (!$result) {
                 // Save
                 $image = new Image_model();
                 $image->faceId = $faceId;
                 $image->gender = $gender;
                 $image->age = $age;
                 $image->save();
-            }
+            //}
         }
         /*
         $faceId = $request->input('faceId');
@@ -151,5 +175,4 @@ final class ImageController extends Controller
         }
         return response()->json($list)->header('Access-Control-Allow-Origin', '*');
     }
-
 }
