@@ -50,10 +50,10 @@ final class ImageController extends Controller
         $faces = json_decode($request->getContent(), true);
         //return $this->jsonGeneral->show_success($hello);
         foreach ($faces as $face) {
-            if (!array_key_exists('faceId', $face)) {
-                return $this->jsonGeneral->show_error('error faceId');
-            }
             $faceId = $face['faceId'];
+            if ($faceId === "") {
+                continue;
+            }
             $faceAttributes = $face['faceAttributes'];
             $gender = trim($faceAttributes['gender']);
             $age = floatval($faceAttributes['age']);
