@@ -1,0 +1,250 @@
+﻿using System;
+using System.Net.Sockets;
+using System.Net;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
+/*
+int width = 1920;
+                int height = 1080;
+                int stride = width * 3;
+                byte[] pixels = new byte[height * stride];
+
+                // Try creating a new image with a custom palette.
+                List<System.Windows.Media.Color> colors = new List<System.Windows.Media.Color>();
+                colors.Add(System.Windows.Media.Colors.Red);
+                colors.Add(System.Windows.Media.Colors.Blue);
+                colors.Add(System.Windows.Media.Colors.Green);
+                BitmapPalette myPalette = new BitmapPalette(colors);
+
+                // Creates a new empty image with the pre-defined palette
+
+                BitmapSource image = BitmapSource.Create(
+                    width,
+                    height,
+                    96,
+                    96,
+                    PixelFormats.Indexed1,
+                    myPalette,
+                    pixels,
+                    stride);
+                Bitmap.
+                unsafe
+                {
+                    fixed (byte* ptr = bmpPixels)
+                    {
+                        bmp = new Bitmap(1920, 1080, 1920*3, PixelFormat.Format24bppRgb, new IntPtr(ptr));
+                        bmp.Save(@"D:/output.bmp");
+                    }
+                }
+				*/
+namespace ImageToMetaData
+{
+    class Program
+    {
+        public static void Main()
+        {
+            MyTcpListener listener = new MyTcpListener();
+            while (true)
+            {
+                Stream imageCopiedStream = listener.ReadStream();
+
+                HttpWriter uploader = new HttpWriter();
+                imageCopiedStream.Seek(0, SeekOrigin.Begin);
+                Stream retStream = uploader.post(imageCopiedStream);
+
+                StreamReader outReader = new StreamReader(retStream);
+                string retJson = outReader.ReadToEnd();
+
+                Console.Write(retJson);
+                Console.WriteLine("\nPress anykey to continue...");
+                Console.ReadKey();
+            }
+        }
+    }
+
+    class MyTcpListener
+    {
+        TcpListener server = null;
+        TcpClient client = null;
+
+        // Set listening port on 13000.
+        Int32 port = 13000;
+
+        private void connect()
+        {
+            try
+            {
+                // Create listening server.
+                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+                server = new TcpListener(localAddr, port);
+
+                // Start listening for client requests.
+                server.Start();
+
+                // Wait here until connect establishes.
+                Console.Write("Waiting for a connection on port {0}...", port);
+
+                // Perform a blocking call to accept requests.
+                // You could also user server.AcceptSocket() here.
+                client = server.AcceptTcpClient();
+                Console.WriteLine("Connected to {0}!", client.Client);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+
+        }
+
+        private Stream internalRead()
+        {   
+            // Get a stream object for reading and writing
+            NetworkStream stream = client.GetStream();
+            MemoryStream imageStream = new MemoryStream();
+            stream.CopyTo(imageStream);
+            //imageStream.Position = 0;
+
+            // Console.WriteLine("Received {0} bytes of data.", total);
+
+            // Send back a response.
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("Finished.");
+            stream.Write(msg, 0, msg.Length);
+
+            // Close down connection.
+            client.Close();
+
+            return imageStream;
+        }
+
+        public Stream ReadStream()
+        {
+            connect();
+            return internalRead();
+        }
+
+        public void Disconnect()
+        {
+            client.Close();
+            server.Stop();
+        }
+    }
+
+    class HttpWriter
+    {
+        static string urlTemplate = "https://api.projectoxford.ai/face/v1.0/detect?returnFaceId={0}&returnFaceLandmarks={1}&returnFaceAttributes={2}";
+        static string key = "2b83e4bd95f943ef8acfecb58ca11441";
+
+        private string urlGenerate(bool returnFaceId, bool returnFaceLandmarks, string returnFaceAttributes)
+        {
+            return string.Format(urlTemplate, returnFaceId.ToString().ToLower(), returnFaceLandmarks.ToString().ToLower(), returnFaceAttributes);
+        }
+
+        private Stream internalUpload(string actionUrl, Stream paramFileStream)
+        {
+            HttpContent fileStreamContent = new StreamContent(paramFileStream);
+            using (var client = new HttpClient())
+            using (var formData = new MultipartFormDataContent())
+            {
+                HttpContent streamContent = new StreamContent(paramFileStream);
+                streamContent.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/octet-stream");
+                streamContent.Headers.Add("Ocp-Apim-Subscription-Key", key);
+                var response = client.PostAsync(actionUrl, streamContent).Result;
+                //if (!response.IsSuccessStatusCode)
+                //{
+                  //  return null;
+                //}
+                return response.Content.ReadAsStreamAsync().Result;
+            }
+        }
+
+        public Stream post(Stream upstream)
+        {
+            return internalUpload(urlGenerate(true, false, "age,gender"), upstream);
+        }
+    }
+}
+
+/*
+    class Program
+    {
+        public static void Main()
+        {
+
+        }
+    }
+    class MyTcpListener
+    {
+        TcpListener server = null;
+
+        // Set listening port on 13000.
+        Int32 port = 13000;
+
+        public void Connect()
+        {
+            try
+            {
+                // Create listening server.
+                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+                server = new TcpListener(localAddr, port);
+
+                // Start listening for client requests.
+                server.Start();
+
+                // Buffer for reading data
+                Byte[] bytes = new Byte[256];
+                String data = null;
+
+                // Enter the listening loop.
+                while (true)
+                {
+                    Console.Write("Waiting for a connection on port {0}...", port);
+
+                    // Perform a blocking call to accept requests.
+                    // You could also user server.AcceptSocket() here.
+                    TcpClient client = server.AcceptTcpClient();
+                    Console.WriteLine("Connected!");
+
+                    // Get a stream object for reading and writing
+                    NetworkStream stream = client.GetStream();
+
+                    int i;
+
+                    // Loop to receive all the data sent by the client.
+                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        // Translate data bytes to a ASCII string.
+                        data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        Console.WriteLine("Received: {0}", data);
+
+                        // Process the data sent by the client.
+                        data = data.ToUpper();
+
+                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+
+                        // Send back a response.
+                        stream.Write(msg, 0, msg.Length);
+                        Console.WriteLine("Sent: {0}", data);
+                    }
+
+                    // Shutdown and end connection
+                    client.Close();
+                }
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+            finally
+            {
+                // Stop listening for new clients.
+                server.Stop();
+            }
+
+
+            Console.WriteLine("\nHit enter to continue...");
+            Console.Read();
+        }
+    }
+*/
