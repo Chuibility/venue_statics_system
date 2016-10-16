@@ -1,7 +1,11 @@
 import React from 'react';
 import {AppBar, Drawer, MenuItem, Tabs, Tab, Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui';
 import {AvMovie, EditorInsertChart, ActionSettings} from 'material-ui/svg-icons';
-import {Doughnut, Bar} from 'react-chartjs';
+import {Doughnut, Bar, Pie} from 'react-chartjs-2';
+import { defaults } from 'react-chartjs-2';
+
+// Disable animating charts by default.
+//defaults.global.animation = false;
 
 const inkBarStyle = {
   display: 'none'
@@ -15,6 +19,17 @@ const paperStyle = {
   display: 'inline-block',
 };
 
+const options = {
+  tooltips: {
+    mode: 'label'
+  },
+  legend: {
+    labels: {
+      fontSize: 20
+    }
+  }
+}
+
 export default class Header extends React.Component {
   constructor(props) {
     super(props);
@@ -27,27 +42,37 @@ export default class Header extends React.Component {
           {
             label: "Female",
             fillColor: "rgba(220,220,220,0.2)",
-            data: [65, 59, 80, 81, 56, 55]
+            data: [0, 0, 0, 0, 0, 0]
           },
           {
             label: "Male",
             fillColor: "rgba(151,187,205,0.2)",
-            data: [65, 59, 80, 81, 56, 55]
+            data: [0, 0, 0, 0, 0, 0]
           }
         ]
       },
-      data: [
-        {
-          value: 200,
-          color: 'Pink',
-          label: 'Female'
-        },
-        {
-          value: 4381,
-          color: 'Cyan',
-          label: 'Male'
-        }
-      ]
+      data: {
+        labels: ['Female', 'Male'],
+        datasets: [
+          {
+            data: [0, 0],
+            backgroundColor: [
+              '#FFC0CB', '#00FFFF'
+            ]
+          }
+        ]
+      },
+      smileData: {
+        labels: ['😄', '😐', '🙁'],
+        datasets: [
+          {
+            data: [0, 0, 0],
+            backgroundColor: [
+              '#00C851', '#ffbb33', '#ff4444'
+            ]
+          }
+        ]
+      }
     };
   }
 
@@ -57,21 +82,50 @@ export default class Header extends React.Component {
 
   componentDidMount () {
     setInterval(() => {
+      fetch("http://121.201.8.23:8088/image/smile").then((result) => {
+        return result.json();
+      }).then((data) => {
+        let updatedData = {
+          labels: ['😄', '😐', '🙁'],
+          datasets: [
+            {
+              data: [0, 0, 0],
+              backgroundColor: [
+                '#00C851', '#ffbb33', '#ff4444'
+              ]
+            }
+          ]
+        };
+        for (let datum of data) {
+          if (datum < 0.33333) {
+            updatedData.datasets[0].data[2] += 1;
+          }
+          else if (datum < 0.66667) {
+            updatedData.datasets[0].data[1] += 1;
+          }
+          else {
+            updatedData.datasets[0].data[0] += 1;
+          }
+        }
+
+        this.setState({
+          smileData: updatedData
+        });
+      });
       fetch("http://121.201.8.23:8088/image/get").then((result) => {
         return result.json();
       }).then((data) => {
-        let updatedData = [
-          {
-            value: 0,
-            color: 'Pink',
-            label: 'Female'
-          },
-          {
-            value: 0,
-            color: 'Cyan',
-            label: 'Male'
-          }
-        ];
+        let updatedData = {
+          labels: ['Female', 'Male'],
+          datasets: [
+            {
+              data: [0, 0],
+              backgroundColor: [
+                '#FFC0CB', '#00FFFF'
+              ]
+            }
+          ]
+        };
 
         let updatedBarData = {
           labels: ["13-16", "17-20", "21-24", "25-28", "29-32", "33-36"],
@@ -91,7 +145,7 @@ export default class Header extends React.Component {
 
         for (let datum of data) {
           if (datum.gender === 'female') {
-            updatedData[0].value += 1;
+            updatedData.datasets[0].data[0] += 1;
             if (datum.age < 16) {
               updatedBarData.datasets[0].data[0] += 1;
             }
@@ -112,7 +166,7 @@ export default class Header extends React.Component {
             }
           }
           else {
-            updatedData[1].value += 1;
+            updatedData.datasets[0].data[1] += 1;
             if (datum.age < 16) {
               updatedBarData.datasets[1].data[0] += 1;
             }
@@ -203,19 +257,31 @@ export default class Header extends React.Component {
                 <CardText
                   style={{textAlign: 'center'}}
                 >
-                  <Doughnut data={this.state.data} width="600" height="250"/>
+                  <Doughnut data={this.state.data} options={options} width={600} height={250} />
                 </CardText>
                 <CardActions>
                 </CardActions>
               </Card>
-              <Card>
+              <Card style={{marginBottom: '50px'}}>
                 <CardHeader
                   title="Age Distribution"
                 />
                 <CardText
                   style={{textAlign: 'center'}}
                 >
-                  <Bar data={this.state.barChartData} width="600" height="250"/>
+                  <Bar data={this.state.barChartData} width={600} height={250} />
+                </CardText>
+                <CardActions>
+                </CardActions>
+              </Card>
+              <Card>
+                <CardHeader
+                  title="Smile Index"
+                />
+                <CardText
+                  style={{textAlign: 'center'}}
+                >
+                  <Pie data={this.state.smileData} options={options} width={600} height={250} />
                 </CardText>
                 <CardActions>
                 </CardActions>
