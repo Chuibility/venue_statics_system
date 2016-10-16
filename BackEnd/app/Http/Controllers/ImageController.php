@@ -51,7 +51,7 @@ final class ImageController extends Controller
         //return $this->jsonGeneral->show_success($hello);
         foreach ($faces as $face) {
             if (!array_key_exists('faceId', $face)) {
-                $this->jsonGeneral->show_error('error faceId');
+                return $this->jsonGeneral->show_error('error faceId');
             }
             $faceId = $face['faceId'];
             $faceAttributes = $face['faceAttributes'];
