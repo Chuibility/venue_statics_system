@@ -1,0 +1,8 @@
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\bin\Release\ImageToMetaData.exe.config
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\bin\Release\ImageToMetaData.exe
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\bin\Release\ImageToMetaData.pdb
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\obj\Release\ImageToMetaData.exe
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\obj\Release\ImageToMetaData.pdb
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\obj\Release\ImageToMetaData.csprojResolveAssemblyReference.cache
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\bin\Release\System.Json.dll
+D:\SJTU\Activities\Hackx\ImageToMetaData\ImageToMetaData\bin\Release\System.Json.xml
