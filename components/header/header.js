@@ -208,7 +208,7 @@ export default class Header extends React.Component {
     return (
       <div>
         <AppBar
-          title="Hello World"
+          title="Meeting"
           onLeftIconButtonTouchTap={this.handleToggle}
         />
         <Drawer
