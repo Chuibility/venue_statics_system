@@ -56,6 +56,7 @@
     <Compile Include="HttpWriter.cs" />
     <Compile Include="JsonTree.cs" />
     <Compile Include="MyTcpListener.cs" />
+    <Content Include="Program-rc.txt" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

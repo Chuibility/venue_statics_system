@@ -18,12 +18,13 @@ namespace ImageToMetaData
             }
         }
 
-        public string postJson(string actionUrl, string json)
+        public string postJson(string actionUrl, string json, string key)
         {
             using (var client = new HttpClient())
             {
                 HttpContent jsonContent = new StringContent(json);
                 jsonContent.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/json");
+                jsonContent.Headers.Add("Ocp-Apim-Subscription-Key", key);
                 var response = client.PostAsync(actionUrl, jsonContent).Result;
                 return response.Content.ReadAsStringAsync().Result;
             }
